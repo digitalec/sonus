@@ -20,6 +20,8 @@ def scan_overdrive_metadata(file_list):
         audio_data = xmltodict.parse(xmlstring)
         for k, v in audio_data.items():
             for key, val in v.items():
+                if not isinstance(val, list):
+                    val = [val]
                 for marker in val:
                     marker['Time'] = convert_timestamp_to_secs(marker['Time'])
                     file_marker['markers'].append(dict(marker))
