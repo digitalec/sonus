@@ -1,0 +1,7 @@
+click~=8.0.3
+ffmpeg-python~=0.2.0
+mutagen~=1.45.1
+packaging~=21.2
+requests~=2.26.0
+tqdm~=4.62.3
+xmltodict~=0.12.0

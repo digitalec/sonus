@@ -1,18 +1,17 @@
 from pathlib import Path
 from setuptools import setup, find_packages
+from sonus import __VERSION__, __PKGNAME__
 
-__version__ = "0.0.1a"
-
-# with open('requirements.txt') as f:
-#     required = f.read().splitlines()
+with open('requirements.txt') as f:
+    required = f.read().splitlines()
 
 HERE = Path(__file__).parent
 README = (HERE / "README.md").read_text()
 DESCRIPTION = "Audiobook client for OverDrive"
 
 setup(
-    name="sonus",
-    version=__version__,
+    name=__PKGNAME__,
+    version=__VERSION__,
     author="digitalec",
     description=DESCRIPTION,
     long_description=README,
@@ -26,6 +25,9 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     python_requires=">=3.6",
-    # install_requires=required,
-    url="https://github.com/digitalec/sonus"
+    install_requires=required,
+    url="https://github.com/digitalec/sonus",
+    entry_points = {
+        "console_scripts": ["sonus=sonus:main.main"]
+    }
 )
