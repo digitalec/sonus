@@ -7,7 +7,7 @@ with open('requirements.txt') as f:
 
 HERE = Path(__file__).parent
 README = (HERE / "README.md").read_text()
-DESCRIPTION = "Audiobook client for OverDrive"
+DESCRIPTION = "Cross-platform OverDrive audiobook client and chapterizer written in Python. "
 
 setup(
     name=__PKGNAME__,
