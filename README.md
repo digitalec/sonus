@@ -3,11 +3,9 @@ sonus is a cross-platform OverDrive audiobook client and chapterizer written in 
 
 This tool was written with the need for a portable way to automate chapterizing and tagging of OverDrive MP3 files for use in standard media players. You must have an active OverDrive account and check-out the books you wish to download.
 
-OverDrive stores XML data in each MP3 file containing chapter timings. The biggest hurdle for this project was to detect and skip duplicate chapter markers (`Chapter 1, Chapter 1 (04:02), Chapter 1 (06:19), etc.`) that sometimes spans across multiple files.
-
 
 ### Features
-- Download and chapterizer audiobooks
+- Download and chapterize audiobooks
 - Chapterize existing OverDrive files
 - Return loan early
 
