@@ -11,8 +11,8 @@ This tool was written with the need for a portable way to automate chapterizing 
 
 
 ### Requirements
-- Python 3.6+
-- ffmpeg
+- Python 3.6+ - [download](https://python.org/)
+- ffmpeg - [download](https://ffmpeg.org/)
 
 
 ### Installation
