@@ -3,6 +3,11 @@ sonus is a cross-platform OverDrive audiobook client and chapterizer written in 
 
 This tool was written with the need for a portable way to automate chapterizing and tagging of OverDrive MP3 files for use in standard media players. You must have an active OverDrive account and check-out the books you wish to download.
 
+![PyPI](https://img.shields.io/pypi/v/sonus?style=flat)
+[![Downloads](https://pepy.tech/badge/sonus)](https://pepy.tech/project/sonus)
+![GitHub last commit](https://img.shields.io/github/last-commit/digitalec/sonus?style=flat)
+![GitHub last release](https://img.shields.io/github/release-date/digitalec/sonus?style=flat)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-blue?style=flat&logo=paypal)](https://paypal.me/digitalec)
 
 ### Features
 - Download and chapterize audiobooks
