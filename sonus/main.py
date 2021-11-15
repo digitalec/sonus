@@ -47,12 +47,12 @@ Support: https://github.com/digitalec/sonus"""
 
 
 @click.command(name='main')
-@click.argument('ODM', metavar='PATH')
+@click.argument('ODM', metavar='PATH', nargs=-1)
 @click.option('-i', '--info', is_flag=True, help="Show info of ODM file", hidden=True)
 @click.option('-r', '--return', 'return_book', is_flag=True, help="Return an audiobook")
 @click.option('-o', '--output', 'output_path', type=str, help="Output directory")
-@click.option('-V', '--verbose', is_flag=True, help="Show verbose output")
-@click.version_option(__VERSION__, '--version', '-v', 'version', message=version_info())
+@click.option('-v', '--verbose', is_flag=True, help="Show verbose output")
+@click.version_option(__VERSION__, '--version', '-V', 'version', message=version_info())
 def main(odm, info, return_book, output_path, verbose):
     """sonus is an OverDrive download manager and chapterizer for audiobooks
     
@@ -82,21 +82,26 @@ def main(odm, info, return_book, output_path, verbose):
         output_path = output_path[:-1]
 
     logger.info(f"Output will be saved to: {output_path}")
+    
+    for arg in [x for x in odm]:
+        logger.debug(f"Input file: {str(arg)}")
+        
+        if Path(arg).is_dir():
+            chapterizer.main(arg, output_path)
 
-    if Path(odm).is_dir():
-        chapterizer.main(odm, output_path)
-
-    elif Path(odm).is_file():
-        if info:
-            get_info()
-        elif return_book:
-            return_odm(odm)
-            sys.exit()
+        elif Path(arg).is_file() and Path(arg).suffix == ".odm":
+            if info:
+                get_info()
+            elif return_book:
+                return_odm(arg)
+                sys.exit()
+        else:
+            continue
 
         tmpdir = tempfile.TemporaryDirectory()
         logger.debug(f"Downloading parts to temporary directory: {tmpdir.name}")
 
-        get_book(odm, tmpdir.name)
+        get_book(arg, tmpdir.name)
 
         chapterizer.main(tmpdir.name, output_path)
 
