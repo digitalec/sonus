@@ -147,6 +147,8 @@ def merge_chapter_parts(file_list, output_dir):
             if not current_save_file:
                 current_save_file = file
 
+            author = str(author).split("/")[0]
+
             # Create output dir if it doesn't exist
             output_to = f"{output_dir}/{author}/{title}"
             Path(output_to).mkdir(parents=True, exist_ok=True)
