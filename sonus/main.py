@@ -49,11 +49,12 @@ Support: https://github.com/digitalec/sonus"""
 @click.command(name='main')
 @click.argument('ODM', metavar='PATH', nargs=-1)
 @click.option('-i', '--info', is_flag=True, help="Show info of ODM file", hidden=True)
+@click.option('-d', '--download', is_flag=True, help="Download book only, do not chapterize")
 @click.option('-r', '--return', 'return_book', is_flag=True, help="Return an audiobook")
 @click.option('-o', '--output', 'output_path', type=str, help="Output directory")
 @click.option('-v', '--verbose', is_flag=True, help="Show verbose output")
 @click.version_option(__VERSION__, '--version', '-V', 'version', message=version_info())
-def main(odm, info, return_book, output_path, verbose):
+def main(odm, info, download, return_book, output_path, verbose):
     """sonus is an OverDrive download manager and chapterizer for audiobooks
     
     You can download and chapterize a book by simply passing the ODM file
@@ -99,14 +100,16 @@ def main(odm, info, return_book, output_path, verbose):
         else:
             continue
 
-        tmpdir = tempfile.TemporaryDirectory()
-        logger.debug(f"Downloading parts to temporary directory: {tmpdir.name}")
-
-        get_book(arg, tmpdir.name)
-
-        chapterizer.main(tmpdir.name, output_path)
-
-        tmpdir.cleanup()
+        if download:
+            logger.debug
+            get_book(arg, output_path)
+            continue
+        else:
+            tmpdir = tempfile.TemporaryDirectory()
+            logger.debug(f"Downloading parts to temporary directory: {tmpdir.name}")
+            get_book(arg, tmpdir.name)
+            chapterizer.main(tmpdir.name, output_path)
+            tmpdir.cleanup()
 
 
 def get_book(odm, o):
