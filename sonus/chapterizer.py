@@ -94,13 +94,17 @@ def get_chapter_timings(file_metadata):
 def split_chapters(files, tmpdir):
     for i, file in enumerate(files):
         logger.info(f"Extracting chapter {file['chapter']} from {file['file'].name}")
-        stream = ffmpeg.input(file['file'], ss=file['start'], to=file['end'])
-        stream = ffmpeg.output(stream, f"{tmpdir.name}/tmp_{str(i).rjust(3, '0')}.mp3", c='copy', f='mp3',
-                               **{'metadata:g:0': f'title={file["chapter"]}',
-                                  'metadata:g:1': f'track={file["track"]}'},
-                               loglevel='quiet')
-        stream = ffmpeg.overwrite_output(stream)
-        ffmpeg.run(stream)
+        try:
+            stream = ffmpeg.input(file['file'], ss=file['start'], to=file['end'])
+            stream = ffmpeg.output(stream, f"{tmpdir.name}/tmp_{str(i).rjust(3, '0')}.mp3", c='copy', f='mp3',
+                                **{'metadata:g:0': f'title={file["chapter"]}',
+                                    'metadata:g:1': f'track={file["track"]}'},
+                                loglevel='quiet')
+            stream = ffmpeg.overwrite_output(stream)
+            ffmpeg.run(stream)
+        except FileNotFoundError as e:
+            if 'ffmpeg' in str(e):
+                print(" --- ERROR! Please make sure ffmpeg is installed")
 
 
 def merge_chapter_parts(file_list, output_dir):
