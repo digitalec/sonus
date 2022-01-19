@@ -88,6 +88,7 @@ def main(odm, info, return_book, output_path, verbose):
         
         if Path(arg).is_dir():
             chapterizer.main(arg, output_path)
+            continue
 
         elif Path(arg).is_file() and Path(arg).suffix == ".odm":
             if info:
