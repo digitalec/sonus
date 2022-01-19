@@ -264,5 +264,5 @@ class Downloader:
 
     @staticmethod
     def _die(msg):
-        logger.error('ERROR: ' + msg + '\n')
+        logger.error(' --- ERROR: ' + msg + '\n')
         sys.exit(1)
