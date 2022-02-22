@@ -107,11 +107,12 @@ def split_chapters(files, tmpdir):
                 print(" --- ERROR! Please make sure ffmpeg is installed")
 
 
-def merge_chapter_parts(file_list, output_dir):
+def merge_chapter_parts(file_list, output_dir, generic=False):
     author, title = None, None
     current_chapter = None
     current_track = None
-    current_save_file = None
+    temp_chapter_file = None
+    generic = generic
 
     for i, file in enumerate(file_list):
         tag_data = ID3(file)
@@ -124,6 +125,8 @@ def merge_chapter_parts(file_list, output_dir):
         if current_chapter is None:
             current_chapter = tag_data.get('TIT2').text[0]
             current_track = int(tag_data.get('TRCK').text[0])
+            if generic:
+                current_chapter = f"Chapter {current_track}"
             logger.debug(f"Set current chapter to {current_chapter} | Track: {current_track}")
 
         logger.debug("Checking if next file belongs to this chapter")
@@ -136,46 +139,52 @@ def merge_chapter_parts(file_list, output_dir):
             last_track = True
 
         if current_track == next_track:
-            if current_save_file:
-                file = current_save_file
-                current_save_file = str(file) + "_" + str(i).rjust(2, '0') + ".mp3"
+            if temp_chapter_file:
+                file = temp_chapter_file
+                temp_chapter_file = str(file) + "_" + str(i).rjust(2, '0') + ".mp3"
             else:
-                current_save_file = str(file) + "_" + str(i).rjust(2, '0') + ".mp3"
+                temp_chapter_file = str(file) + "_" + str(i).rjust(2, '0') + ".mp3"
+
+            temp_chapter_file = temp_chapter_file.replace(':', '-')
             logger.debug(f"Merging {file} with {next_file}")
             stream = ffmpeg.input(f"concat:{file}|{next_file}")
-            stream = ffmpeg.output(stream, str(current_save_file), c="copy", loglevel='quiet')
+            stream = ffmpeg.output(stream, str(temp_chapter_file), c="copy", loglevel='quiet')
             stream = ffmpeg.overwrite_output(stream)
-            logger.debug(f"Saving to {current_save_file}")
+            logger.debug(f"Saving to {temp_chapter_file}")
             ffmpeg.run(stream)
         else:
-            if not current_save_file:
-                current_save_file = file
+            if not temp_chapter_file:
+                temp_chapter_file = file
 
             author = str(author).split("/")[0]
 
             # Create output dir if it doesn't exist
             output_to = f"{output_dir}/{author}/{title}"
             Path(output_to).mkdir(parents=True, exist_ok=True)
-            logger.info(f"Saving chapter to {output_to}/{current_chapter}.mp3")
+            if generic:
+                chapter_filename = f"Chapter {current_track}"
+            else:
+                chapter_filename = current_chapter
+            logger.info(f"Saving chapter to {output_to}/{chapter_filename}.mp3")
 
             # Save chapter to output directory
-            shutil.copy(current_save_file, f"{output_dir}/{author}/{title}/{current_chapter}.mp3")
+            shutil.copy(temp_chapter_file, f"{output_dir}/{author}/{title}/{chapter_filename}.mp3")
             if not last_track:
                 logger.debug(f"Next track is different, track {next_track}")
             current_track = None
             current_chapter = None
-            current_save_file = None
+            temp_chapter_file = None
 
 
-def main(input_dir, output_dir):
+def main(input_dir, output_dir, generic_chapters):
     file_list = sorted([f for f in Path(input_dir).rglob('*.mp3')])
     tmpdir = tempfile.TemporaryDirectory()
-    logger.debug(f"Temporary directory created at: {tmpdir}")
+    logger.debug(f"Temporary directory created at: {tmpdir.name}")
     all_markers = scan_overdrive_metadata(file_list)
     chapter_names = get_chapter_list(all_markers)
     logger.info(f"Found {len(file_list)} files, containing {len(chapter_names)} chapters...")
     timings = get_chapter_timings(all_markers)
     split_chapters(timings, tmpdir)
     tmpfiles = sorted([f for f in Path(tmpdir.name).rglob('*.mp3')])
-    merge_chapter_parts(tmpfiles, output_dir)
+    merge_chapter_parts(tmpfiles, output_dir, generic_chapters)
     tmpdir.cleanup()
