@@ -164,6 +164,13 @@ def merge_chapter_parts(file_list, output_dir, generic=False):
             if generic:
                 chapter_filename = f"Chapter {current_track}"
             else:
+                invalid_chars = [
+                    ['!', ''],
+                    ['?', ''],
+                    [':', ' -'],
+                ]
+                for i in invalid_chars:
+                    current_chapter = current_chapter.replace(i[0], i[1])
                 chapter_filename = str(current_track) + " " + current_chapter
             logger.info(f"Saving chapter to {output_to}/{chapter_filename}.mp3")
 
