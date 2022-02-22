@@ -164,7 +164,7 @@ def merge_chapter_parts(file_list, output_dir, generic=False):
             if generic:
                 chapter_filename = f"Chapter {current_track}"
             else:
-                chapter_filename = current_chapter
+                chapter_filename = str(current_track) + " " + current_chapter
             logger.info(f"Saving chapter to {output_to}/{chapter_filename}.mp3")
 
             # Save chapter to output directory
