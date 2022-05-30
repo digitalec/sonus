@@ -50,13 +50,14 @@ Support: https://github.com/digitalec/sonus"""
 @click.argument('ODM', metavar='PATH', nargs=-1)
 @click.option('-i', '--info', is_flag=True, help="Show info of ODM file", hidden=True)
 @click.option('-d', '--download', is_flag=True, help="Download book only, do not chapterize")
+@click.option('-O', '--offset', type=int, help="Specify number of seconds to offset chapter start (+/-)")
 @click.option('-g', '--generic', is_flag=True, help="Use generic chapter names (Chapter 1, Chapter 2, etc.)")
 @click.option('-r', '--return', 'return_book', is_flag=True, help="Return an audiobook")
 @click.option('-o', '--output', 'output_path', type=str, help="Output directory")
 @click.option('-v', '--verbose', is_flag=True, help="Show verbose output")
 @click.option('-f', '--ffmpeg-debug', is_flag=True, help="Show debug messages for ffmpeg")
 @click.version_option(__VERSION__, '--version', '-V', 'version', message=version_info())
-def main(odm, info, download, generic, return_book, output_path, verbose, ffmpeg_debug):
+def main(odm, info, download, offset, generic, return_book, output_path, verbose, ffmpeg_debug):
     """sonus is an OverDrive download manager and chapterizer for audiobooks
     
     You can download and chapterize a book by simply passing the ODM file
@@ -95,7 +96,7 @@ def main(odm, info, download, generic, return_book, output_path, verbose, ffmpeg
         logger.debug(f"Input file: {str(arg)}")
         
         if Path(arg).is_dir():
-            chapterizer.main(arg, output_path, generic, ffmpeg_debug)
+            chapterizer.main(arg, output_path, generic, offset, ffmpeg_debug)
             continue
 
         elif Path(arg).is_file() and Path(arg).suffix == ".odm":
@@ -115,7 +116,7 @@ def main(odm, info, download, generic, return_book, output_path, verbose, ffmpeg
             tmpdir = tempfile.TemporaryDirectory()
             logger.debug(f"Downloading parts to temporary directory: {tmpdir.name}")
             get_book(arg, tmpdir.name)
-            chapterizer.main(tmpdir.name, output_path, generic, ffmpeg_debug)
+            chapterizer.main(tmpdir.name, output_path, generic, offset, ffmpeg_debug)
             tmpdir.cleanup()
 
 

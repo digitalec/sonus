@@ -91,11 +91,14 @@ def get_chapter_timings(file_metadata):
     return breakdown
 
 
-def split_chapters(files, tmpdir, ffmpeg_debug):
+def split_chapters(files, tmpdir, offset, ffmpeg_debug):
     for i, file in enumerate(files):
+        if offset and file['start'] != 0.0:
+            file['start'] = float(file['start']) + offset
         if file['start'] == file['end']:
             continue
         logger.info(f"Extracting chapter {file['chapter']} from {file['file'].name}")
+        logger.debug(f"\t>> File:{file['file']} Start:{file['start']} End:{file['end']}")
         try:
             stream = ffmpeg.input(file['file'], ss=file['start'], to=file['end'])
             stream = ffmpeg.output(stream, f"{tmpdir.name}/tmp_{str(i).rjust(3, '0')}.mp3", c='copy', f='mp3',
@@ -185,7 +188,7 @@ def merge_chapter_parts(file_list, output_dir, generic=False):
             temp_chapter_file = None
 
 
-def main(input_dir, output_dir, generic_chapters, debug):
+def main(input_dir, output_dir, generic_chapters, offset, debug):
     file_list = sorted([f for f in Path(input_dir).rglob('*.mp3')])
     tmpdir = tempfile.TemporaryDirectory()
     logger.debug(f"Temporary directory created at: {tmpdir.name}")
@@ -193,7 +196,7 @@ def main(input_dir, output_dir, generic_chapters, debug):
     chapter_names = get_chapter_list(all_markers)
     logger.info(f"Found {len(file_list)} files, containing {len(chapter_names)} chapters...")
     timings = get_chapter_timings(all_markers)
-    split_chapters(timings, tmpdir, debug)
+    split_chapters(timings, tmpdir, offset, debug)
     tmpfiles = sorted([f for f in Path(tmpdir.name).rglob('*.mp3')])
     merge_chapter_parts(tmpfiles, output_dir, generic_chapters)
     tmpdir.cleanup()
