@@ -108,7 +108,7 @@ def main(odm, info, download, generic, return_book, output_path, verbose, ffmpeg
             continue
 
         if download:
-            logger.debug
+            logger.debug(f"Downloading audiobook to {output_path}")
             get_book(arg, output_path)
             continue
         else:
