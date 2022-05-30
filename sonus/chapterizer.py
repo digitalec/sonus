@@ -93,6 +93,8 @@ def get_chapter_timings(file_metadata):
 
 def split_chapters(files, tmpdir):
     for i, file in enumerate(files):
+        if file['start'] == file['end']:
+            continue
         logger.info(f"Extracting chapter {file['chapter']} from {file['file'].name}")
         try:
             stream = ffmpeg.input(file['file'], ss=file['start'], to=file['end'])
