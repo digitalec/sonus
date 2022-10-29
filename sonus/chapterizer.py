@@ -173,6 +173,14 @@ def merge_chapter_parts(file_list, output_dir, generic=False):
                     ['!', ''],
                     ['?', ''],
                     [':', ' -'],
+                    ['/', ' - '],
+                    ['\\', ' '],
+                    ['"', ' '],
+                    ['<', ' '],
+                    ['>', ' '],
+                    ['|', ' '],
+                    ['*', ' '],
+                    ['?', ' ']
                 ]
                 for i in invalid_chars:
                     current_chapter = current_chapter.replace(i[0], i[1])
