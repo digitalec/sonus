@@ -110,10 +110,34 @@ class Downloader:
             logger.debug('Could not download cover. Status code: {}'.format(
                 r.status_code))
 
+
+    @staticmethod
+    def clean_title(title):
+        invalid_chars = [
+            ['!', ''],
+            ['?', ''],
+            [':', ' -'],
+            ['/', ' - '],
+            ['\\', ' '],
+            ['"', ' '],
+            ['<', ' '],
+            ['>', ' '],
+            ['|', ' '],
+            ['*', ' '],
+            ['?', ' ']
+        ]
+
+        for i in invalid_chars:
+            title = title.replace(i[0], i[1])
+        
+        return title
+
+
     def _extract_author_title_urls_parts(self, odm_filename):
         odm_root, metadata = self._get_odm_root_and_metadata(odm_filename)
         author = self._get_author_from_metadata(metadata)
         title = metadata.findtext('Title')
+        title = clean_title(title)
         cover_url = metadata.findtext('CoverUrl', '')
         logger.info('Got title "{}" and author'.format(title)
                      + ('s' if ';' in author else '')
