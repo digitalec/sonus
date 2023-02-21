@@ -137,7 +137,7 @@ class Downloader:
         odm_root, metadata = self._get_odm_root_and_metadata(odm_filename)
         author = self._get_author_from_metadata(metadata)
         title = metadata.findtext('Title')
-        title = clean_title(title)
+        title = self.clean_title(title)
         cover_url = metadata.findtext('CoverUrl', '')
         logger.info('Got title "{}" and author'.format(title)
                      + ('s' if ';' in author else '')
