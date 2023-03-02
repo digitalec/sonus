@@ -8,6 +8,8 @@ from mutagen.id3 import ID3
 import ffmpeg
 from pathlib import Path
 
+import sys
+
 logger = logging.getLogger(__name__)
 
 
@@ -23,6 +25,8 @@ def scan_overdrive_metadata(file_list):
                 if not isinstance(val, list):
                     val = [val]
                 for marker in val:
+                    # Clean Name (Chapter) and Time
+                    marker['Name'] = clean_file_string(marker['Name'])
                     marker['Time'] = convert_timestamp_to_secs(marker['Time'])
                     file_marker['markers'].append(dict(marker))
         all_markers.append(file_marker)
@@ -112,6 +116,27 @@ def split_chapters(files, tmpdir, offset, ffmpeg_debug):
                 print(" --- ERROR! Please make sure ffmpeg is installed")
 
 
+def clean_file_string(file_string):
+    invalid_chars = [
+        ['!', ''],
+        ['?', ''],
+        [':', '-'],
+        ['/', '-'],
+        ['\\', ' '],
+        ['"', ' '],
+        ['<', ' '],
+        ['>', ' '],
+        ['|', ' '],
+        ['*', ' '],
+        ['?', ' ']
+    ]
+    
+    for i in invalid_chars:
+        file_string = file_string.replace(i[0], i[1])
+    
+    return file_string
+
+
 def merge_chapter_parts(file_list, output_dir, generic=False):
     author, title = None, None
     current_chapter = None
@@ -120,10 +145,11 @@ def merge_chapter_parts(file_list, output_dir, generic=False):
     generic = generic
 
     for i, file in enumerate(file_list):
+
         tag_data = ID3(file)
         if not author:
             author = tag_data.get('TPE1')
-            title = tag_data.get('TALB')
+            title = tag_data.get('TALB').text[0]
             logger.info(f"Processing audiobook \"{title}\" by {author}")
         last_track = False
 
@@ -163,27 +189,17 @@ def merge_chapter_parts(file_list, output_dir, generic=False):
 
             author = str(author).split("/")[0]
 
+            author = clean_file_string(author)
+            title = clean_file_string(title)
+
             # Create output dir if it doesn't exist
             output_to = f"{output_dir}/{author}/{title}"
+
             Path(output_to).mkdir(parents=True, exist_ok=True)
             if generic:
                 chapter_filename = f"Chapter {current_track}"
             else:
-                invalid_chars = [
-                    ['!', ''],
-                    ['?', ''],
-                    [':', ' -'],
-                    ['/', ' - '],
-                    ['\\', ' '],
-                    ['"', ' '],
-                    ['<', ' '],
-                    ['>', ' '],
-                    ['|', ' '],
-                    ['*', ' '],
-                    ['?', ' ']
-                ]
-                for i in invalid_chars:
-                    current_chapter = current_chapter.replace(i[0], i[1])
+                current_chapter = clean_file_string(current_chapter)
                 chapter_filename = str(current_track) + " " + current_chapter
             logger.info(f"Saving chapter to {output_to}/{chapter_filename}.mp3")
 
