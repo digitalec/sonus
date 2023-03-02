@@ -8,6 +8,8 @@ import uuid
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
 
+from .chapterizer import clean_file_string
+
 import requests
 
 from os.path import (abspath, basename, expanduser, getsize, isdir, isfile, sep)
@@ -111,33 +113,11 @@ class Downloader:
                 r.status_code))
 
 
-    @staticmethod
-    def clean_title(title):
-        invalid_chars = [
-            ['!', ''],
-            ['?', ''],
-            [':', ' -'],
-            ['/', ' - '],
-            ['\\', ' '],
-            ['"', ' '],
-            ['<', ' '],
-            ['>', ' '],
-            ['|', ' '],
-            ['*', ' '],
-            ['?', ' ']
-        ]
-
-        for i in invalid_chars:
-            title = title.replace(i[0], i[1])
-        
-        return title
-
-
     def _extract_author_title_urls_parts(self, odm_filename):
         odm_root, metadata = self._get_odm_root_and_metadata(odm_filename)
         author = self._get_author_from_metadata(metadata)
         title = metadata.findtext('Title')
-        title = self.clean_title(title)
+        title = clean_file_string(title)
         cover_url = metadata.findtext('CoverUrl', '')
         logger.info('Got title "{}" and author'.format(title)
                      + ('s' if ';' in author else '')
