@@ -19,6 +19,7 @@ def scan_overdrive_metadata(file_list):
         file_marker = {'file': file, 'markers': []}
         tag_data = ID3(file)
         xmlstring = str(tag_data['TXXX:OverDrive MediaMarkers'])
+        xmlstring = xmlstring.replace("&", "and")
         audio_data = xmltodict.parse(xmlstring)
         for k, v in audio_data.items():
             for key, val in v.items():
