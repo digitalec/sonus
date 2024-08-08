@@ -150,7 +150,10 @@ def merge_chapter_parts(file_list, output_dir, generic=False):
         tag_data = ID3(file)
         if not author:
             author = tag_data.get('TPE1')
-            title = tag_data.get('TALB').text[0]
+            try:
+                title = tag_data.get('TALB').text[0]
+            except AttributeError:
+                title = "Unknown Title"
             logger.info(f"Processing audiobook \"{title}\" by {author}")
         last_track = False
 
